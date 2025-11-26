@@ -1,13 +1,10 @@
 package com.tramasys.auth.domain.model;
 
-import jakarta.persistence.*;
 import java.util.UUID;
 import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Table(name = "roles")
 @Getter
 @Setter
 @Data
@@ -15,11 +12,8 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Role {
-    @Id
-    @GeneratedValue
-    private UUID id;
 
-    @Column(unique = true, nullable = false)
+    private UUID id;
     private String name;
 
     @Builder.Default

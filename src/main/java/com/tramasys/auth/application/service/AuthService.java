@@ -35,10 +35,10 @@ public class AuthService {
     private final JwtUtil jwt;
 
     public AuthService(UserRepositoryPort userRepo,
-                       RoleRepositoryPort roleRepo,
-                       RefreshTokenRepositoryPort refreshRepo,
-                       PasswordEncoder encoder,
-                       JwtUtil jwt) {
+            RoleRepositoryPort roleRepo,
+            RefreshTokenRepositoryPort refreshRepo,
+            PasswordEncoder encoder,
+            JwtUtil jwt) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.refreshRepo = refreshRepo;
@@ -63,7 +63,7 @@ public class AuthService {
         // 2. Resolve Roles
         Set<Role> roles = new HashSet<>();
         List<String> requestedRoles = request.getRoles();
-        
+
         // Default to "USER" role if none provided
         if (requestedRoles == null || requestedRoles.isEmpty()) {
             requestedRoles = List.of("USER");
@@ -103,10 +103,9 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         // Find user by Username OR Email OR Phone
         User user = userRepo.findByUsernameOrEmailOrPhone(
-                        request.getIdentifier(),
-                        request.getIdentifier(),
-                        request.getIdentifier()
-                )
+                request.getIdentifier(),
+                request.getIdentifier(),
+                request.getIdentifier())
                 .orElseThrow(() -> new AuthenticationException("Invalid credentials"));
 
         if (!encoder.matches(request.getPassword(), user.getPassword()))
@@ -125,18 +124,25 @@ public class AuthService {
         RefreshToken token = refreshRepo.findByToken(request.getRefreshToken())
                 .orElseThrow(() -> new AuthenticationException("Invalid refresh token"));
 
-        if (token.isRevoked() || token.getExpiry().isBefore(Instant.now())) {
-            throw new AuthenticationException("Refresh token expired or revoked");
+        // Sécurité : Détection de réutilisation (Token Theft)
+        if (token.isRevoked()) {
+            // ALERTE : Quelqu'un essaie d'utiliser un vieux token.
+            // On invalide TOUTE la session de l'utilisateur par sécurité.
+            refreshRepo.deleteAllByUserId(token.getUserId());
+            throw new AuthenticationException("Session compromise (token réutilisé). Veuillez vous reconnecter.");
         }
 
-        User user = userRepo.findById(token.getUserId())
-            .orElseThrow(() -> new AuthenticationException("User not found"));
+        if (token.isExpired()) { // Utilisez la méthode utilitaire isExpired() du modèle
+            throw new AuthenticationException("Refresh token expired");
+        }
 
-        // 1. Revoke the USED refresh token prevents reuse (Rotation)
+        // Rotation
         token.setRevoked(true);
         refreshRepo.save(token);
 
-        // 2. Generate a completely NEW pair
+        User user = userRepo.findById(token.getUserId())
+                .orElseThrow(() -> new AuthenticationException("User not found"));
+
         return generateTokensForUser(user);
     }
 
@@ -188,6 +194,20 @@ public class AuthService {
     }
 
     private UserResponse toUserResponse(User u) {
+        // 1. Récupérer les noms des permissions directes
+        Set<String> effectivePermissions = u.getPermissions().stream()
+                .map(Permission::getName)
+                .collect(Collectors.toSet());
+
+        // 2. Ajouter les permissions provenant des rôles
+        if (u.getRoles() != null) {
+            u.getRoles().forEach(role -> {
+                if (role.getPermissions() != null) {
+                    role.getPermissions().forEach(p -> effectivePermissions.add(p.getName()));
+                }
+            });
+        }
+
         return UserResponse.builder()
                 .id(u.getId().toString())
                 .username(u.getUsername())
@@ -196,7 +216,7 @@ public class AuthService {
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
                 .roles(u.getRoles().stream().map(Role::getName).collect(Collectors.toSet()))
-                .permissions(u.getPermissions().stream().map(Permission::getName).collect(Collectors.toSet()))
+                .permissions(effectivePermissions) // On renvoie la liste combinée
                 .build();
     }
 }

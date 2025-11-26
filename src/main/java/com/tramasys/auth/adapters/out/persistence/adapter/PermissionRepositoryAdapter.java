@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -43,5 +45,12 @@ public class PermissionRepositoryAdapter implements PermissionRepositoryPort {
     @Override
     public void deleteById(UUID id) {
         spring.deleteById(id);
+    }
+
+    @Override
+    public List<Permission> findAll() {
+        return spring.findAll().stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 }

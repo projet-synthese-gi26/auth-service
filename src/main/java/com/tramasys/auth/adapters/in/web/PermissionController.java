@@ -6,11 +6,18 @@ import com.tramasys.auth.application.dto.request.AssignPermissionToRoleRequest;
 import com.tramasys.auth.application.dto.response.PermissionResponse;
 import com.tramasys.auth.application.service.PermissionService;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/permissions")
+@Tag(name = "Permissions", description = "Permission management")
+@SecurityRequirement(name = "bearerAuth")
 public class PermissionController {
 
     private final PermissionService permissionService;
@@ -29,6 +36,12 @@ public class PermissionController {
             @PathVariable UUID id,
             @RequestBody PermissionUpdateRequest request) {
         return permissionService.update(id, request);
+    }
+
+    @GetMapping
+    @Operation(summary = "List all Permissions")
+    public List<PermissionResponse> getAll() {
+        return permissionService.getAllPermissions();
     }
 
     @DeleteMapping("/{id}")

@@ -12,6 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import com.tramasys.auth.config.JwtAuthenticationEntryPoint;
 
 @Configuration
 @EnableWebSecurity
@@ -19,11 +20,14 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,
-            CorsConfigurationSource corsConfigurationSource) {
+                          CorsConfigurationSource corsConfigurationSource,
+                          JwtAuthenticationEntryPoint unauthorizedHandler) { 
         this.jwtAuthFilter = jwtAuthFilter;
         this.corsConfigurationSource = corsConfigurationSource;
+        this.unauthorizedHandler = unauthorizedHandler;
     }
 
     @Bean
@@ -31,6 +35,9 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(unauthorizedHandler)
+                )
                 .authorizeHttpRequests(auth -> auth
                         // 1. Allow Public Auth Endpoints
                         .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh", "/error")
@@ -38,7 +45,8 @@ public class SecurityConfig {
 
                         // 2. Allow Swagger UI Resources (ADD THIS BLOCK)
                         .requestMatchers(
-                                "/v3/api-docs/**",
+                                "/v3/api-docs/**", // Standard par défaut
+                                "/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html")
                         .permitAll()

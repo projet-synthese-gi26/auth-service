@@ -11,64 +11,74 @@ import com.tramasys.auth.domain.port.out.RoleRepositoryPort;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PermissionService {
 
-    private final PermissionRepositoryPort permissionRepo;
-    private final RoleRepositoryPort roleRepo;
+        private final PermissionRepositoryPort permissionRepo;
+        private final RoleRepositoryPort roleRepo;
 
-    public PermissionService(PermissionRepositoryPort permissionRepo,
-                             RoleRepositoryPort roleRepo) {
-        this.permissionRepo = permissionRepo;
-        this.roleRepo = roleRepo;
-    }
+        public PermissionService(PermissionRepositoryPort permissionRepo,
+                        RoleRepositoryPort roleRepo) {
+                this.permissionRepo = permissionRepo;
+                this.roleRepo = roleRepo;
+        }
 
-    public PermissionResponse create(PermissionCreateRequest request) {
-        permissionRepo.findByName(request.getName())
-                .ifPresent(p -> { throw new PermissionException("Permission already exists"); });
+        public PermissionResponse create(PermissionCreateRequest request) {
+                permissionRepo.findByName(request.getName())
+                                .ifPresent(p -> {
+                                        throw new PermissionException("Permission already exists");
+                                });
 
-        Permission permission = Permission.builder()
-                .id(UUID.randomUUID())
-                .name(request.getName())
-                .description(request.getDescription())
-                .build();
+                Permission permission = Permission.builder()
+                                .id(UUID.randomUUID())
+                                .name(request.getName())
+                                .description(request.getDescription())
+                                .build();
 
-        Permission saved = permissionRepo.save(permission);
+                Permission saved = permissionRepo.save(permission);
 
-        return PermissionResponse.builder()
-                .id(saved.getId().toString())
-                .name(saved.getName())
-                .description(saved.getDescription())
-                .build();
-    }
+                return PermissionResponse.builder()
+                                .id(saved.getId().toString())
+                                .name(saved.getName())
+                                .description(saved.getDescription())
+                                .build();
+        }
 
-    public PermissionResponse update(UUID id, PermissionUpdateRequest request) {
-        Permission permission = permissionRepo.findById(id)
-                .orElseThrow(() -> new PermissionException("Not found"));
+        public PermissionResponse update(UUID id, PermissionUpdateRequest request) {
+                Permission permission = permissionRepo.findById(id)
+                                .orElseThrow(() -> new PermissionException("Not found"));
 
-        permission.setDescription(request.getDescription());
-        Permission saved = permissionRepo.save(permission);
+                permission.setDescription(request.getDescription());
+                Permission saved = permissionRepo.save(permission);
 
-        return PermissionResponse.builder()
-                .id(saved.getId().toString())
-                .name(saved.getName())
-                .description(saved.getDescription())
-                .build();
-    }
+                return PermissionResponse.builder()
+                                .id(saved.getId().toString())
+                                .name(saved.getName())
+                                .description(saved.getDescription())
+                                .build();
+        }
 
-    public void delete(UUID id) {
-        permissionRepo.deleteById(id);
-    }
+        public void delete(UUID id) {
+                permissionRepo.deleteById(id);
+        }
 
-    public void assignPermissionToRole(String permissionName, String roleName) {
-        Permission permission = permissionRepo.findByName(permissionName)
-                .orElseThrow(() -> new PermissionException("Permission not found"));
+        public void assignPermissionToRole(String permissionName, String roleName) {
+                Permission permission = permissionRepo.findByName(permissionName)
+                                .orElseThrow(() -> new PermissionException("Permission not found"));
 
-        Role role = roleRepo.findByName(roleName)
-                .orElseThrow(() -> new PermissionException("Role not found"));
+                Role role = roleRepo.findByName(roleName)
+                                .orElseThrow(() -> new PermissionException("Role not found"));
 
-        role.getPermissions().add(permission);
-        roleRepo.save(role);
-    }
+                role.getPermissions().add(permission);
+                roleRepo.save(role);
+        }
+
+        public List<PermissionResponse> getAllPermissions() {
+                return permissionRepo.findAll().stream()
+                                .map(p -> new PermissionResponse(p.getId().toString(), p.getName(), p.getDescription()))
+                                .collect(Collectors.toList());
+        }
 }
