@@ -102,9 +102,9 @@ jobs:
             echo " Checking container health..."
             STATUS=$(docker inspect --format='{{json .State.Health.Status}}' ${{ env.CONTAINER_NAME }})
 
-            echo "Health status: \$STATUS"
+            echo "Health status: $STATUS"
 
-            if [ "\$STATUS" != "\"healthy\"" ]; then
+            if [ "$STATUS" != "\"healthy\"" ]; then
               echo "ERROR: Container is not healthy"
               exit 1
             fi
