@@ -82,7 +82,7 @@ jobs:
 
             docker login ghcr.io -u ${{ secrets.REGISTRY_NAMESPACE }} -p ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-            cd /home/${{ secrets.REMOTE_USER }}/deploy
+            cd /root/projet_synthese/infra
 
             echo "Stopping container"
             docker compose down ${{ env.CONTAINER_NAME }}
