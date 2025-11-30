@@ -48,7 +48,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**", // Standard par défaut
                                 "/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html")
+                                "/swagger-ui.html",
+                                "/actuator/**")
                         .permitAll()
 
                         // 3. Everything else requires authentication
