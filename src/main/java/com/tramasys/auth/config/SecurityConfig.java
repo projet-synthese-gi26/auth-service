@@ -12,7 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
-import com.tramasys.auth.config.JwtAuthenticationEntryPoint;
+import org.springframework.http.HttpMethod;
 
 @Configuration
 @EnableWebSecurity
@@ -36,23 +36,25 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .exceptionHandling(exception -> exception
-                .authenticationEntryPoint(unauthorizedHandler)
+                    .authenticationEntryPoint(unauthorizedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
                         // 1. Allow Public Auth Endpoints
-                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh", "/error")
-                        .permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh", "/error").permitAll()
 
-                        // 2. Allow Swagger UI Resources (ADD THIS BLOCK)
+                        // 2. Allow Swagger UI Resources
                         .requestMatchers(
-                                "/v3/api-docs/**", // Standard par défaut
+                                "/v3/api-docs/**",
                                 "/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/actuator/**")
                         .permitAll()
 
-                        // 3. Everything else requires authentication
+                        // 3. CRITICAL FIX: Allow all OPTIONS requests (Pre-flight)
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+
+                        // 4. Everything else requires authentication
                         .anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
