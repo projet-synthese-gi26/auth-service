@@ -1,6 +1,8 @@
 package com.tramasys.auth.domain.port.out;
 
+import com.tramasys.auth.domain.model.TramasysService;
 import com.tramasys.auth.domain.model.User;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,4 +26,5 @@ public interface UserRepositoryPort {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);
+    List<User> findAllByService(TramasysService service);
 }

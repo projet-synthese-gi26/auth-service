@@ -83,6 +83,7 @@ public class DomainEntityMapper {
                 .firstName(e.getFirstName())
                 .lastName(e.getLastName())
                 .password(e.getPasswordHash())
+                .service(e.getService())
                 .enabled(e.isEnabled())
                 .createdAt(e.getCreatedAt() == null ? Instant.now() : e.getCreatedAt())
                 .roles(roles)
@@ -100,6 +101,7 @@ public class DomainEntityMapper {
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
                 .passwordHash(u.getPassword())
+                .service(u.getService())
                 .enabled(u.isEnabled())
                 .createdAt(u.getCreatedAt() == null ? Instant.now() : u.getCreatedAt());
 

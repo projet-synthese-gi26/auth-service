@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 
+import com.tramasys.auth.domain.model.TramasysService;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -73,5 +75,11 @@ public class UserController {
     public void changePassword(@PathVariable UUID id,
             @RequestBody com.tramasys.auth.application.dto.request.ChangePasswordRequest request) {
         userService.changePassword(id, request);
+    }
+
+    @GetMapping("/service/{service}")
+    @Operation(summary = "Get Users by Service", description = "Returns all users belonging to a specific Tramasys Service.")
+    public List<UserResponse> getByService(@PathVariable TramasysService service) {
+        return userService.getAllByService(service);
     }
 }

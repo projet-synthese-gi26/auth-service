@@ -21,6 +21,10 @@ public class User {
     private String firstName;
     private String lastName;
     private String password;
+    
+    // New Attribute
+    private TramasysService service; 
+
     @Builder.Default
     private boolean enabled = true;
     @Builder.Default
