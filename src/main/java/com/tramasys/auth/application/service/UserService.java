@@ -19,6 +19,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.tramasys.auth.domain.model.TramasysService;
+import java.util.List;
+
 @Service
 @Transactional
 public class UserService {
@@ -50,6 +53,13 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponse getByPhone(String phone) {
         return toUserResponse(userRepo.findByPhone(phone).orElseThrow(() -> new NotFoundException("User not found")));
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAllByService(TramasysService service) {
+        return userRepo.findAllByService(service).stream()
+                .map(this::toUserResponse)
+                .collect(Collectors.toList());
     }
 
     public UserResponse update(UUID userId, UserUpdateRequest request) {
@@ -122,6 +132,7 @@ public class UserService {
         return UserResponse.builder()
                 .id(u.getId().toString())
                 .username(u.getUsername())
+                .service(u.getService())
                 .email(u.getEmail())
                 .phone(u.getPhone())
                 .firstName(u.getFirstName())

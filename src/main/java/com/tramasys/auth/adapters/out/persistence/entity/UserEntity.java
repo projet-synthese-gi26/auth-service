@@ -1,5 +1,6 @@
 package com.tramasys.auth.adapters.out.persistence.entity;
 
+import com.tramasys.auth.domain.model.TramasysService; 
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,12 +40,17 @@ public class UserEntity {
     @Column(name = "password", nullable = false)
     private String passwordHash;
 
+    // New Column mapped as String in DB
+    @Enumerated(EnumType.STRING)
+    @Column(name = "service")
+    private TramasysService service;
+
     private boolean enabled = true;
 
     @Column(name = "created_at")
     private Instant createdAt;
 
-    // user_roles
+    // ... (Keep existing relationships) ...
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
@@ -54,7 +60,6 @@ public class UserEntity {
     @Builder.Default
     private Set<RoleEntity> roles = new HashSet<>();
 
-    // user_permissions
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_permissions",

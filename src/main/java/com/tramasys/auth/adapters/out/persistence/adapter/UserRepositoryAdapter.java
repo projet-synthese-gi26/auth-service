@@ -8,6 +8,10 @@ import com.tramasys.auth.domain.port.out.UserRepositoryPort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tramasys.auth.domain.model.TramasysService;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -68,5 +72,12 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public boolean existsByPhone(String phone) {
         return spring.existsByPhone(phone);
+    }
+
+    @Override
+    public List<User> findAllByService(TramasysService service) {
+        return spring.findAllByService(service).stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
     }
 }

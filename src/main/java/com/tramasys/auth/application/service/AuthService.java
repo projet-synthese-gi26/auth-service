@@ -24,6 +24,9 @@ import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.tramasys.auth.domain.model.TramasysService;
+import java.util.List;
+
 @Service
 @Transactional
 public class AuthService {
@@ -84,6 +87,7 @@ public class AuthService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .password(encoder.encode(request.getPassword()))
+                .service(request.getService())
                 .enabled(true)
                 .createdAt(Instant.now())
                 .roles(roles)
@@ -215,6 +219,7 @@ public class AuthService {
                 .phone(u.getPhone())
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
+                .service(u.getService())
                 .roles(u.getRoles().stream().map(Role::getName).collect(Collectors.toSet()))
                 .permissions(effectivePermissions) // On renvoie la liste combinée
                 .build();

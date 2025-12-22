@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import com.tramasys.auth.domain.model.TramasysService;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter
@@ -35,6 +37,9 @@ public class RegisterRequest {
 
     @NotBlank(message = "Last name is required")
     private String lastName;
+
+    @NotNull(message = "Service is required (LETS_GO, RIDE_AND_GO, etc.)")
+    private TramasysService service;
 
     private List<String> roles; // e.g. ["USER", "ADMIN"]
 }
