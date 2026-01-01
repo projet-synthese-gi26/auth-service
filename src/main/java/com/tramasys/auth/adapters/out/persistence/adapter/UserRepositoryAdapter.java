@@ -80,4 +80,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 .map(mapper::toDomain)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<User> findAll() {
+        return spring.findAll().stream()
+                .map(mapper::toDomain)
+                .collect(Collectors.toList());
+    }
 }

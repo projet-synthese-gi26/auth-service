@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 
 import com.tramasys.auth.domain.model.TramasysService;
 import java.util.List;
+import org.springframework.lang.NonNull;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -35,4 +36,9 @@ public interface SpringUserRepository extends JpaRepository<UserEntity, UUID> {
 
     @EntityGraph(attributePaths = {"roles", "roles.permissions", "permissions"})
     List<UserEntity> findAllByService(TramasysService service);
+
+    @Override
+    @NonNull
+    @EntityGraph(attributePaths = {"roles", "roles.permissions", "permissions"})
+    List<UserEntity> findAll();
 }
