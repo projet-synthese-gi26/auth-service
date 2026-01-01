@@ -23,8 +23,8 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
 
     public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter,
-                          CorsConfigurationSource corsConfigurationSource,
-                          JwtAuthenticationEntryPoint unauthorizedHandler) { 
+            CorsConfigurationSource corsConfigurationSource,
+            JwtAuthenticationEntryPoint unauthorizedHandler) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.corsConfigurationSource = corsConfigurationSource;
         this.unauthorizedHandler = unauthorizedHandler;
@@ -36,11 +36,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .exceptionHandling(exception -> exception
-                    .authenticationEntryPoint(unauthorizedHandler)
-                )
+                        .authenticationEntryPoint(unauthorizedHandler))
                 .authorizeHttpRequests(auth -> auth
                         // 1. Allow Public Auth Endpoints
-                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh", "/error").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh", "/error")
+                        .permitAll()
 
                         // 2. Allow Swagger UI Resources
                         .requestMatchers(
@@ -58,7 +58,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/roles").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/permissions").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/roles/*/permissions").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users").permitAll() 
+                        // User listing endpoint
+                        .requestMatchers(HttpMethod.GET, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/service/**").permitAll() // Get by Service
+                        .requestMatchers(HttpMethod.GET, "/api/users/email/**").permitAll() // Get by Email
+                        .requestMatchers(HttpMethod.GET, "/api/users/username/**").permitAll() // Get by Username
+                        .requestMatchers(HttpMethod.GET, "/api/users/phone/**").permitAll()
                         // --------------------------------------------------------------
 
                         // 4. Everything else requires authentication
