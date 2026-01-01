@@ -27,4 +27,5 @@ public interface UserRepositoryPort {
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);
     List<User> findAllByService(TramasysService service);
+    List<User> findAll();
 }

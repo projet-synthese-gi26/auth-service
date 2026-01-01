@@ -62,6 +62,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAllUsers() {
+        return userRepo.findAll().stream()
+                .map(this::toUserResponse)
+                .collect(Collectors.toList());
+    }
+
     public UserResponse update(UUID userId, UserUpdateRequest request) {
         User user = findUserById(userId);
         if (request.getPhone() != null && !request.getPhone().equals(user.getPhone())) {
@@ -114,6 +121,7 @@ public class UserService {
         return userRepo.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found with ID: " + id));
     }
+    
 
     private UserResponse toUserResponse(User u) {
         // Logique corrigée pour inclure les permissions héritées

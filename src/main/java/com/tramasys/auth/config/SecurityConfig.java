@@ -57,7 +57,8 @@ public class SecurityConfig {
                         // --- AJOUT : Routes publiques GET pour Rôles et Permissions ---
                         .requestMatchers(HttpMethod.GET, "/api/roles").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/permissions").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/roles/*/permissions").permitAll() 
+                        .requestMatchers(HttpMethod.GET, "/api/roles/*/permissions").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users").permitAll() 
                         // --------------------------------------------------------------
 
                         // 4. Everything else requires authentication

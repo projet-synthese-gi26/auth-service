@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 
 import com.tramasys.auth.domain.model.TramasysService;
 import java.util.List;
@@ -47,6 +48,13 @@ public class UserController {
     @Operation(summary = "Get User by Phone")
     public UserResponse getByPhone(@PathVariable String phone) {
         return userService.getByPhone(phone);
+    }
+
+    @GetMapping
+    @Operation(summary = "Get All Users", description = "Public endpoint to list all registered users.")
+    @SecurityRequirements() // <--- DÉSACTIVE LE CADENAS SWAGGER
+    public List<UserResponse> getAll() {
+        return userService.getAllUsers();
     }
 
     @PutMapping("/{id}")
