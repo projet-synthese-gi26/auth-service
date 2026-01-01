@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 
 import java.util.UUID;
 import java.util.List;
@@ -40,6 +41,7 @@ public class PermissionController {
 
     @GetMapping
     @Operation(summary = "List all Permissions")
+    @SecurityRequirements()
     public List<PermissionResponse> getAll() {
         return permissionService.getAllPermissions();
     }
