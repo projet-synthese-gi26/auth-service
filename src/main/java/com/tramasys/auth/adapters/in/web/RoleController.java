@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,7 @@ public class RoleController {
 
     @GetMapping
     @Operation(summary = "List all Roles")
+    @SecurityRequirements()
     public List<RoleResponse> getAll() {
         return roleService.getAllRoles();
     }
@@ -48,6 +50,7 @@ public class RoleController {
 
     @GetMapping("/{name}/permissions")
     @Operation(summary = "Get Permissions for a specific Role")
+    @SecurityRequirements()
     public Set<PermissionResponse> getRolePermissions(@PathVariable String name) {
         return roleService.getPermissionsByRole(name);
     }

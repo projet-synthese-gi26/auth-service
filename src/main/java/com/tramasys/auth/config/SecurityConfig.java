@@ -52,7 +52,13 @@ public class SecurityConfig {
                         .permitAll()
 
                         // 3. CRITICAL FIX: Allow all OPTIONS requests (Pre-flight)
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // --- AJOUT : Routes publiques GET pour Rôles et Permissions ---
+                        .requestMatchers(HttpMethod.GET, "/api/roles").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/permissions").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/roles/*/permissions").permitAll() 
+                        // --------------------------------------------------------------
 
                         // 4. Everything else requires authentication
                         .anyRequest().authenticated())
