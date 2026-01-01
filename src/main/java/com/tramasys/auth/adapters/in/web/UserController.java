@@ -34,18 +34,21 @@ public class UserController {
 
     @GetMapping("/email/{email}")
     @Operation(summary = "Get User by Email")
+    @SecurityRequirements()
     public UserResponse getByEmail(@PathVariable String email) {
         return userService.getByEmail(email);
     }
 
     @GetMapping("/username/{username}")
     @Operation(summary = "Get User by Username")
+    @SecurityRequirements()
     public UserResponse getByUsername(@PathVariable String username) {
         return userService.getByUsername(username);
     }
 
     @GetMapping("/phone/{phone}")
     @Operation(summary = "Get User by Phone")
+    @SecurityRequirements()
     public UserResponse getByPhone(@PathVariable String phone) {
         return userService.getByPhone(phone);
     }
@@ -87,6 +90,7 @@ public class UserController {
 
     @GetMapping("/service/{service}")
     @Operation(summary = "Get Users by Service", description = "Returns all users belonging to a specific Tramasys Service.")
+    @SecurityRequirements()
     public List<UserResponse> getByService(@PathVariable TramasysService service) {
         return userService.getAllByService(service);
     }
