@@ -25,6 +25,9 @@ public class User {
     // New Attribute
     private TramasysService service; 
 
+    private UUID photoId;
+    private String photoUri;
+
     @Builder.Default
     private boolean enabled = true;
     @Builder.Default

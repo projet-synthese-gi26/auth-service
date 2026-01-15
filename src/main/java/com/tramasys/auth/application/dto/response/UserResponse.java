@@ -1,6 +1,7 @@
 package com.tramasys.auth.application.dto.response;
 
 import com.tramasys.auth.domain.model.TramasysService;
+import java.util.UUID;
 import lombok.*;
 import java.util.Set;
 
@@ -16,7 +17,9 @@ public class UserResponse {
     private String phone;
     private String firstName;
     private String lastName;
-    private TramasysService service; // <--- Add this
+    private TramasysService service;
+    private UUID photoId;
+    private String photoUri;
     private Set<String> roles;
     private Set<String> permissions;
 }

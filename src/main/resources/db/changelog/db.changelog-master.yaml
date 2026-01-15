@@ -3,3 +3,5 @@ databaseChangeLog:
       file: db/changelog/migration/01-initial-schema.sql
   - include:
       file: db/changelog/migration/02-add-service-and-fix-cascade.sql
+  - include:
+      file: db/changelog/migration/03-add-user-photo.sql

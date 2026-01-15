@@ -19,6 +19,8 @@ import com.tramasys.auth.util.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import com.tramasys.auth.domain.port.out.MediaStoragePort;
 
 import java.time.Instant;
 import java.util.*;
@@ -36,22 +38,24 @@ public class AuthService {
     private final RefreshTokenRepositoryPort refreshRepo;
     private final PasswordEncoder encoder;
     private final JwtUtil jwt;
+    private final MediaStoragePort mediaPort;
 
     public AuthService(UserRepositoryPort userRepo,
             RoleRepositoryPort roleRepo,
             RefreshTokenRepositoryPort refreshRepo,
             PasswordEncoder encoder,
-            JwtUtil jwt) {
+            JwtUtil jwt, MediaStoragePort mediaPort) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.refreshRepo = refreshRepo;
         this.encoder = encoder;
         this.jwt = jwt;
+        this.mediaPort = mediaPort;
     }
 
     /* --------------------------- REGISTER --------------------------- */
 
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request, MultipartFile photoFile) {
 
         // 1. Validation of duplicates
         if (userRepo.existsByUsername(request.getUsername()))
@@ -94,10 +98,21 @@ public class AuthService {
                 .permissions(Set.of()) // Explicit permissions usually empty at register
                 .build();
 
+                if (photoFile != null && !photoFile.isEmpty()) {
+            try {
+                var mediaResult = mediaPort.upload(photoFile, request.getService());
+                user.setPhotoId(mediaResult.id());
+                user.setPhotoUri(mediaResult.uri());
+            } catch (Exception e) {
+                // Choix métier : Fail fast ou log warning ? Ici on fail fast car l'user a demandé une photo.
+                throw new RuntimeException("Error uploading profile picture: " + e.getMessage());
+            }
+        }
+        // -------------------------------------
+
         // 4. Save User
         User saved = userRepo.save(user);
 
-        // 5. Generate Token Pair
         return generateTokensForUser(saved);
     }
 

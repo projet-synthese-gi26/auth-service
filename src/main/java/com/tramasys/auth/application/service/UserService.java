@@ -14,6 +14,8 @@ import com.tramasys.auth.domain.port.out.UserRepositoryPort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.tramasys.auth.domain.port.out.MediaStoragePort;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 import java.util.UUID;
@@ -28,15 +30,39 @@ public class UserService {
 
     private final UserRepositoryPort userRepo;
     private final RoleRepositoryPort roleRepo; // Ajout
-    private final PasswordEncoder encoder;     // Ajout
+    private final PasswordEncoder encoder;     
+    private final MediaStoragePort mediaPort;
 
-    public UserService(UserRepositoryPort userRepo, RoleRepositoryPort roleRepo, PasswordEncoder encoder) {
+    public UserService(UserRepositoryPort userRepo, RoleRepositoryPort roleRepo, PasswordEncoder encoder, MediaStoragePort mediaPort) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.encoder = encoder;
+        this.mediaPort = mediaPort;
     }
 
-    // ... (Les méthodes getById, getByEmail, etc. restent inchangées) ...
+    public UserResponse updateProfilePicture(UUID userId, MultipartFile file) {
+        User user = findUserById(userId);
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File must not be empty");
+        }
+
+        if (user.getPhotoId() != null) {
+            // UPDATE: Remplacement via l'API Media
+            var result = mediaPort.replace(user.getPhotoId(), file);
+            // L'ID ne change généralement pas, mais l'URI pourrait changer (versionning, cache busting)
+            user.setPhotoUri(result.uri());
+        } else {
+            // CREATE: Upload initial
+            var result = mediaPort.upload(file, user.getService());
+            user.setPhotoId(result.id());
+            user.setPhotoUri(result.uri());
+        }
+
+        User saved = userRepo.save(user);
+        return toUserResponse(saved);
+    }
+
     @Transactional(readOnly = true)
     public UserResponse getById(UUID id) { return toUserResponse(findUserById(id)); }
     
@@ -147,6 +173,8 @@ public class UserService {
                 .lastName(u.getLastName())
                 .roles(u.getRoles().stream().map(Role::getName).collect(Collectors.toSet()))
                 .permissions(effectivePermissions)
+                .photoId(u.getPhotoId())
+                .photoUri(u.getPhotoUri())
                 .build();
     }
 }

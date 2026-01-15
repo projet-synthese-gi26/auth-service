@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.tramasys.auth.domain.model.TramasysService;
 import java.util.List;
@@ -64,6 +66,14 @@ public class UserController {
     @Operation(summary = "Update User Profile", description = "Updates first name, last name, or phone.")
     public UserResponse update(@PathVariable UUID id, @RequestBody UserUpdateRequest request) {
         return userService.update(id, request);
+    }
+
+    @Operation(summary = "Update Profile Picture", description = "Uploads or replaces the user's profile picture.")
+    @PostMapping(value = "/{id}/picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UserResponse updatePicture(
+            @PathVariable UUID id,
+            @RequestPart("file") MultipartFile file) {
+        return userService.updateProfilePicture(id, file);
     }
 
     @PostMapping("/{id}/roles/{roleName}")

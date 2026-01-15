@@ -5,15 +5,18 @@ import com.tramasys.auth.application.dto.response.*;
 import com.tramasys.auth.application.service.AuthService;
 import com.tramasys.auth.util.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter; // <--- IMPORT AJOUTÉ
+import io.swagger.v3.oas.annotations.media.Content; // <--- IMPORT AJOUTÉ
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType; // <--- IMPORT AJOUTÉ
 import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 import com.tramasys.auth.domain.exception.AuthenticationException;
-
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -26,14 +29,18 @@ public class AuthController {
         this.auth = auth;
     }
 
-    @Operation(summary = "Register a new user", description = "Creates a new user account and returns access tokens.")
+    @Operation(summary = "Register a new user", description = "Creates a new user account with optional profile picture.")
     @ApiResponse(responseCode = "201", description = "User successfully registered")
     @ApiResponse(responseCode = "400", description = "Validation error")
     @ApiResponse(responseCode = "409", description = "Username or Email already exists")
-    @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED) // Returns 201 Created on success
-    public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
-        return auth.register(request);
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthResponse register(
+            @Valid @RequestPart("data") @Parameter(content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)) 
+            RegisterRequest request,
+
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        return auth.register(request, file);
     }
 
     @Operation(summary = "User Login", description = "Authenticates a user via Username/Email/Phone and Password.")

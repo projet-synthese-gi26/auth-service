@@ -45,6 +45,12 @@ public class UserEntity {
     @Column(name = "service")
     private TramasysService service;
 
+    @Column(name = "photo_id")
+    private UUID photoId;
+
+    @Column(name = "photo_uri", length = 512)
+    private String photoUri;
+
     private boolean enabled = true;
 
     @Column(name = "created_at")

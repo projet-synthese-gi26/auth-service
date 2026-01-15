@@ -84,6 +84,8 @@ public class DomainEntityMapper {
                 .lastName(e.getLastName())
                 .password(e.getPasswordHash())
                 .service(e.getService())
+                .photoId(e.getPhotoId())
+                .photoUri(e.getPhotoUri())
                 .enabled(e.isEnabled())
                 .createdAt(e.getCreatedAt() == null ? Instant.now() : e.getCreatedAt())
                 .roles(roles)
@@ -102,6 +104,8 @@ public class DomainEntityMapper {
                 .lastName(u.getLastName())
                 .passwordHash(u.getPassword())
                 .service(u.getService())
+                .photoId(u.getPhotoId())
+                .photoUri(u.getPhotoUri())
                 .enabled(u.isEnabled())
                 .createdAt(u.getCreatedAt() == null ? Instant.now() : u.getCreatedAt());
 
