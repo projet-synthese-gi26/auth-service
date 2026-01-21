@@ -5,3 +5,5 @@ databaseChangeLog:
       file: db/changelog/migration/02-add-service-and-fix-cascade.sql
   - include:
       file: db/changelog/migration/03-add-user-photo.sql
+  - include:
+      file: db/changelog/migration/04-create-password-reset-tokens.sql

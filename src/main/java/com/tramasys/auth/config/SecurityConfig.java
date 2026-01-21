@@ -64,6 +64,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/users/email/**").permitAll() // Get by Email
                         .requestMatchers(HttpMethod.GET, "/api/users/username/**").permitAll() // Get by Username
                         .requestMatchers(HttpMethod.GET, "/api/users/phone/**").permitAll()
+
+                        .requestMatchers("/api/password/**").permitAll()
+
+                        // 4. Routes de lecture publiques (si souhaité)
+                        .requestMatchers(HttpMethod.GET, "/api/roles", "/api/permissions").permitAll()
                         // --------------------------------------------------------------
 
                         // 4. Everything else requires authentication

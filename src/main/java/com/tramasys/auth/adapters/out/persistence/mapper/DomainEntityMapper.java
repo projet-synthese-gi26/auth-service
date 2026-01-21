@@ -8,6 +8,8 @@ import com.tramasys.auth.domain.model.Permission;
 import com.tramasys.auth.domain.model.RefreshToken;
 import com.tramasys.auth.domain.model.Role;
 import com.tramasys.auth.domain.model.User;
+import com.tramasys.auth.domain.model.PasswordResetToken;
+import com.tramasys.auth.adapters.out.persistence.entity.PasswordResetTokenEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -140,6 +142,29 @@ public class DomainEntityMapper {
                 .expiry(r.getExpiry())
                 .revoked(r.isRevoked())
                 .createdAt(r.getCreatedAt() == null ? Instant.now() : r.getCreatedAt())
+                .build();
+    }
+
+    public PasswordResetToken toDomain(PasswordResetTokenEntity e) {
+        if (e == null) return null;
+        return PasswordResetToken.builder()
+                .id(e.getId())
+                .code(e.getCode())
+                // On extrait juste l'ID du user pour le domaine
+                .userId(e.getUser() != null ? e.getUser().getId() : null)
+                .expiryDate(e.getExpiryDate())
+                .createdAt(e.getCreatedAt())
+                .build();
+    }
+
+    public PasswordResetTokenEntity toEntity(PasswordResetToken d, UserEntity userEntity) {
+        if (d == null) return null;
+        return PasswordResetTokenEntity.builder()
+                .id(d.getId() == null ? UUID.randomUUID() : d.getId())
+                .code(d.getCode())
+                .user(userEntity) // On a besoin de l'entité User complète ici
+                .expiryDate(d.getExpiryDate())
+                .createdAt(d.getCreatedAt() == null ? Instant.now() : d.getCreatedAt())
                 .build();
     }
 }

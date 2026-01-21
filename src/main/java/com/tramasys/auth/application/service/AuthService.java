@@ -98,16 +98,19 @@ public class AuthService {
                 .permissions(Set.of()) // Explicit permissions usually empty at register
                 .build();
 
-                if (photoFile != null && !photoFile.isEmpty()) {
+        if (photoFile != null && !photoFile.isEmpty()) {
+            System.out.println("Uploading file: " + photoFile.getOriginalFilename()); // Debug log
             try {
                 var mediaResult = mediaPort.upload(photoFile, request.getService());
                 user.setPhotoId(mediaResult.id());
                 user.setPhotoUri(mediaResult.uri());
             } catch (Exception e) {
-                // Choix métier : Fail fast ou log warning ? Ici on fail fast car l'user a demandé une photo.
-                throw new RuntimeException("Error uploading profile picture: " + e.getMessage());
+                throw new RuntimeException("Media Upload Failed: " + e.getMessage());
             }
-        }
+        } else {
+            System.out.println("No file received or file is empty."); // Debug log
+        }    
+        
         // -------------------------------------
 
         // 4. Save User
