@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.tramasys.auth.domain.port.out.MediaStoragePort;
 import org.springframework.web.multipart.MultipartFile;
+import com.tramasys.auth.domain.port.out.RefreshTokenRepositoryPort;
 
 import java.util.Set;
 import java.util.UUID;
@@ -32,12 +33,14 @@ public class UserService {
     private final RoleRepositoryPort roleRepo; // Ajout
     private final PasswordEncoder encoder;     
     private final MediaStoragePort mediaPort;
+    private final RefreshTokenRepositoryPort refreshRepo;
 
-    public UserService(UserRepositoryPort userRepo, RoleRepositoryPort roleRepo, PasswordEncoder encoder, MediaStoragePort mediaPort) {
+    public UserService(UserRepositoryPort userRepo, RoleRepositoryPort roleRepo, PasswordEncoder encoder, MediaStoragePort mediaPort, RefreshTokenRepositoryPort refreshRepo) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.encoder = encoder;
         this.mediaPort = mediaPort;
+        this.refreshRepo = refreshRepo;
     }
 
     public UserResponse updateProfilePicture(UUID userId, MultipartFile file) {
@@ -176,5 +179,26 @@ public class UserService {
                 .photoId(u.getPhotoId())
                 .photoUri(u.getPhotoUri())
                 .build();
+    }
+
+    public void deleteUserByEmail(String email) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException("User not found with email: " + email));
+        
+        // 1. Suppression explicite des tokens (sécurité + intégrité référentielle)
+        refreshRepo.deleteAllByUserId(user.getId());
+        
+        // 2. Suppression de l'utilisateur (la BDD gérera la cascade pour les rôles/permissions via les tables de jointure)
+        userRepo.deleteByEmail(email);
+        
+        // Optionnel : Si vous voulez supprimer la photo du Media Service
+        if (user.getPhotoId() != null) {
+            try {
+                mediaPort.delete(user.getPhotoId());
+            } catch (Exception e) {
+                // On log juste, on ne bloque pas la suppression de l'user pour ça
+                System.err.println("Warning: Failed to delete media for user " + email);
+            }
+        }
     }
 }

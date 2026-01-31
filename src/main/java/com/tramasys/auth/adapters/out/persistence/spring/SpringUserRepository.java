@@ -34,6 +34,8 @@ public interface SpringUserRepository extends JpaRepository<UserEntity, UUID> {
     @EntityGraph(attributePaths = {"roles", "roles.permissions", "permissions"})
     Optional<UserEntity> findByUsernameOrEmailOrPhone(String username, String email, String phone);
 
+    void deleteByEmail(String email);
+
     @EntityGraph(attributePaths = {"roles", "roles.permissions", "permissions"})
     List<UserEntity> findAllByService(TramasysService service);
 

@@ -10,6 +10,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+import org.springframework.http.ResponseEntity;
+
 @RestController
 @RequestMapping("/api/password")
 @Tag(name = "Password Management", description = "Endpoints publics pour la gestion du mot de passe oublié")
@@ -24,7 +27,8 @@ public class PasswordController {
     // Route 1 : Demande de réinitialisation (Public)
     @Operation(summary = "Forgot Password", description = "Génère un code OTP et l'envoie par email.")
     @PostMapping("/forgot")
-    @ResponseStatus(HttpStatus.NO_CONTENT) // 204: On ne dit pas explicitement si l'email existe ou non pour éviter l'énumération (sécurité)
+    @ResponseStatus(HttpStatus.NO_CONTENT) // 204: On ne dit pas explicitement si l'email existe ou non pour éviter
+                                           // l'énumération (sécurité)
     public void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         passwordResetService.initiatePasswordReset(request);
     }
@@ -40,8 +44,10 @@ public class PasswordController {
     // Route 3 : Réinitialisation finale (Public)
     @Operation(summary = "Reset Password", description = "Change le mot de passe en utilisant le code OTP validé.")
     @PostMapping("/reset")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void resetPassword(@Valid @RequestBody ResetPasswordConfirmRequest request) {
+    public ResponseEntity<Map<String, String>> resetPassword(@Valid @RequestBody ResetPasswordConfirmRequest request) {
         passwordResetService.resetPassword(request);
+
+        // Retourne un feedback positif explicite
+        return ResponseEntity.ok(Map.of("message", "Le mot de passe a été réinitialisé avec succès."));
     }
 }

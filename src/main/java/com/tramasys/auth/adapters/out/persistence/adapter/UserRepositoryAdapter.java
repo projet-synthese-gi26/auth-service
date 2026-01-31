@@ -60,6 +60,11 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public void deleteByEmail(String email) {
+        spring.deleteByEmail(email);
+    }
+
+    @Override
     public boolean existsByUsername(String username) {
         return spring.existsByUsername(username);
     }

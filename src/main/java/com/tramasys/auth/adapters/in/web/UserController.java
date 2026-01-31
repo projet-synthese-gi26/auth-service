@@ -104,4 +104,11 @@ public class UserController {
     public List<UserResponse> getByService(@PathVariable TramasysService service) {
         return userService.getAllByService(service);
     }
+
+    @DeleteMapping("/email/{email}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete User by Email", description = "Deletes a user account, their tokens, and associated data.")
+    public void deleteByEmail(@PathVariable String email) {
+        userService.deleteUserByEmail(email);
+    }
 }

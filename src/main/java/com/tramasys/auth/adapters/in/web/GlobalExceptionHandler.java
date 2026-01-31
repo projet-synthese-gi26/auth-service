@@ -10,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.tramasys.auth.domain.exception.InvalidCredentialsException;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -69,5 +70,11 @@ public class GlobalExceptionHandler {
             body.put("details", details);
         }
         return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidCredentials(InvalidCredentialsException ex) {
+        // On renvoie une 400 Bad Request car la requête du client contient un code erroné
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
     }
 }

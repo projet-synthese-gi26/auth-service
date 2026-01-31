@@ -23,6 +23,8 @@ public interface UserRepositoryPort {
      */
     Optional<User> findByUsernameOrEmailOrPhone(String username, String email, String phone);
 
+    void deleteByEmail(String email);
+
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     boolean existsByPhone(String phone);
