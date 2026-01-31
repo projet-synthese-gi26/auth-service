@@ -121,7 +121,7 @@ public class AuthService {
 
     /* --------------------------- LOGIN --------------------------- */
 
-    @Transactional(readOnly = true)
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         // Find user by Username OR Email OR Phone
         User user = userRepo.findByUsernameOrEmailOrPhone(
