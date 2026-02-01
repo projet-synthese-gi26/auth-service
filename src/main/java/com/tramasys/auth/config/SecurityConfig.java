@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/roles/*/permissions").permitAll()
                         // User listing endpoint
                         .requestMatchers(HttpMethod.GET, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/service/**").permitAll() // Get by Service
                         .requestMatchers(HttpMethod.GET, "/api/users/email/**").permitAll() // Get by Email
                         .requestMatchers(HttpMethod.GET, "/api/users/username/**").permitAll() // Get by Username

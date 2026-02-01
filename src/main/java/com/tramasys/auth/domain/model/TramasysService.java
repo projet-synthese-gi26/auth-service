@@ -7,5 +7,6 @@ public enum TramasysService {
     SYNDICAT,
     NAVIGOO,
     PAYMENT,
-    FARE_CALCULATOR
+    FARE_CALCULATOR,
+    USER_DELETED
 }

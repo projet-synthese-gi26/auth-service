@@ -30,6 +30,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get User by ID")
+    @SecurityRequirements()
     public UserResponse getById(@PathVariable UUID id) {
         return userService.getById(id);
     }
