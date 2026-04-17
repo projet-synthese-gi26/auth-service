@@ -69,5 +69,3 @@ CREATE TABLE refresh_tokens (
 -- 8. INSERT DEFAULT DATA (Optional but recommended)
 INSERT INTO roles (id, name) VALUES ('d8a0c2c1-2f08-4e12-b054-054523955677', 'USER');
 INSERT INTO roles (id, name) VALUES ('e2d0f9a2-4a02-4b33-a021-932131234981', 'ADMIN');
-INSERT INTO roles (id, name) VALUES ('336f15c1-f458-4587-af7c-9befcd5826fb', 'DRIVER');
-INSERT INTO roles (id, name) VALUES ('f8141049-1af8-416f-a8c8-3f9cc4c364b3', 'CLIENT');

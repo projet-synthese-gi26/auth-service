@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/migration/03-add-user-photo.sql
   - include:
       file: db/changelog/migration/04-create-password-reset-tokens.sql
+  - include:
+      file: db/changelog/migration/05-add-default-roles.sql
