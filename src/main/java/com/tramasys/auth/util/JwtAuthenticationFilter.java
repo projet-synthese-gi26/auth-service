@@ -47,8 +47,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             UUID userId = UUID.fromString(claims.getSubject());
             String username = claims.get("username", String.class);
-            List<String> roles = (List<String>) claims.get("roles");
-            List<String> permissions = (List<String>) claims.get("permissions");
+
+            List<?> rawRoles = claims.get("roles", List.class);
+            List<String> roles = rawRoles != null ? 
+                rawRoles.stream().map(Object::toString).toList() : List.of();
+
+            List<?> rawPermissions = claims.get("permissions", List.class);
+            List<String> permissions = rawPermissions != null ? 
+                rawPermissions.stream().map(Object::toString).toList() : List.of();
 
             // 3. Set your Custom Context (for your business logic)
             UserContext.set(userId, username, roles, permissions);

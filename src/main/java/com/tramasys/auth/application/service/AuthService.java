@@ -55,26 +55,11 @@ public class AuthService {
 
     /* --------------------------- REGISTER --------------------------- */
 
-    public AuthResponse register(RegisterRequest request, MultipartFile photoFile) {
-
-        // 1. Validation of duplicates
-        if (userRepo.existsByUsername(request.getUsername()))
-            throw new DuplicateResourceException("Username already taken");
-
-        if (request.getEmail() != null && userRepo.existsByEmail(request.getEmail()))
-            throw new DuplicateResourceException("Email already taken");
-
-        if (request.getPhone() != null && userRepo.existsByPhone(request.getPhone()))
-            throw new DuplicateResourceException("Phone already taken");
-
-        // 2. Resolve Roles
+    @Transactional // Seule cette partie verrouille la base de données
+    protected User saveUserWithData(RegisterRequest request, UUID photoId, String photoUri) {
         Set<Role> roles = new HashSet<>();
-        List<String> requestedRoles = request.getRoles();
-
-        // Default to "USER" role if none provided
-        if (requestedRoles == null || requestedRoles.isEmpty()) {
-            requestedRoles = List.of("USER");
-        }
+        List<String> requestedRoles = request.getRoles() == null || request.getRoles().isEmpty() ? 
+                                    List.of("USER") : request.getRoles();
 
         for (String roleName : requestedRoles) {
             Role role = roleRepo.findByName(roleName)
@@ -82,7 +67,6 @@ public class AuthService {
             roles.add(role);
         }
 
-        // 3. Create User Domain Object
         User user = User.builder()
                 .id(UUID.randomUUID())
                 .username(request.getUsername())
@@ -92,31 +76,35 @@ public class AuthService {
                 .lastName(request.getLastName())
                 .password(encoder.encode(request.getPassword()))
                 .service(request.getService())
+                .photoId(photoId)    // On utilise les données de l'upload
+                .photoUri(photoUri)
                 .enabled(true)
                 .createdAt(Instant.now())
                 .roles(roles)
-                .permissions(Set.of()) // Explicit permissions usually empty at register
                 .build();
 
+        return userRepo.save(user);
+    }
+
+    public AuthResponse register(RegisterRequest request, MultipartFile photoFile) {
+        // 1. Validation de base (Hors transaction)
+        if (userRepo.existsByUsername(request.getUsername()))
+            throw new DuplicateResourceException("Username already taken");
+
+        // 2. Gestion de l'upload (Hors transaction - AVANT)
+        UUID uploadedPhotoId = null;
+        String uploadedPhotoUri = null;
+
         if (photoFile != null && !photoFile.isEmpty()) {
-            System.out.println("Uploading file: " + photoFile.getOriginalFilename()); // Debug log
-            try {
-                var mediaResult = mediaPort.upload(photoFile, request.getService());
-                user.setPhotoId(mediaResult.id());
-                user.setPhotoUri(mediaResult.uri());
-            } catch (Exception e) {
-                throw new RuntimeException("Media Upload Failed: " + e.getMessage());
-            }
-        } else {
-            System.out.println("No file received or file is empty."); // Debug log
-        }    
-        
-        // -------------------------------------
+            var mediaResult = mediaPort.upload(photoFile, request.getService());
+            uploadedPhotoId = mediaResult.id();
+            uploadedPhotoUri = mediaResult.uri();
+        }
 
-        // 4. Save User
-        User saved = userRepo.save(user);
+        // 3. Appel de la logique de sauvegarde (Dans une méthode séparée @Transactional)
+        User savedUser = saveUserWithData(request, uploadedPhotoId, uploadedPhotoUri);
 
-        return generateTokensForUser(saved);
+        return generateTokensForUser(savedUser);
     }
 
     /* --------------------------- LOGIN --------------------------- */
@@ -238,6 +226,8 @@ public class AuthService {
                 .firstName(u.getFirstName())
                 .lastName(u.getLastName())
                 .service(u.getService())
+                .photoId(u.getPhotoId()) 
+                .photoUri(u.getPhotoUri())
                 .roles(u.getRoles().stream().map(Role::getName).collect(Collectors.toSet()))
                 .permissions(effectivePermissions) // On renvoie la liste combinée
                 .build();

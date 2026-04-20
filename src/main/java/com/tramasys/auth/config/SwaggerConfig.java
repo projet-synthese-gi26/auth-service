@@ -11,9 +11,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
-@OpenAPIDefinition(info = @Info(title = "TraMaSys Auth API", version = "v1", description = "Service d'authentification centralisé"), servers = {
-        @Server(url = "/", description = "Default Server URL")
-})
+@OpenAPIDefinition(
+    info = @Info(title = "TraMaSys Auth API", version = "v1", description = "Service d'authentification centralisé"), 
+
+    servers = {
+        // Le premier serveur est celui par défaut dans l'UI Swagger
+        @Server(url = "https://traefikdev.yowyob.com/auth", description = "Serveur de Développement (via Proxy)"),
+        @Server(url = "/", description = "Serveur Local / Relatif")
+    }
+)
 @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 public class SwaggerConfig {
 

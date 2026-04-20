@@ -63,7 +63,7 @@ http://localhost:8080/swagger-ui.html
 
 ### Comment tester dans Swagger ?
 
-- Utilisez l'endpoint POST /api/auth/login pour obtenir un token.
+- Utilisez l'endpoint POST /auth/login pour obtenir un token.
 - Copiez l'accessToken de la réponse.
 - Cliquez sur le bouton Authorize (cadenas) en haut de la page Swagger.
 - Entrez le token sous la forme : Bearer VOTRE_TOKEN_ICI.
